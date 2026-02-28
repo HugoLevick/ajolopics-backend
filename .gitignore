@@ -2,6 +2,7 @@
 
 # uploads
 uploads/*
+!uploads/.gitkeep
 
 # compiled output
 /dist
