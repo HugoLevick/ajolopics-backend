@@ -1,7 +1,5 @@
 import * as bcrypt from 'bcrypt';
 import {
-  BadRequestException,
-  HttpStatus,
   Inject,
   Injectable,
   InternalServerErrorException,
