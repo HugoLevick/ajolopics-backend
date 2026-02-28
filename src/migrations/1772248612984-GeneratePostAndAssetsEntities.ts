@@ -1,9 +1,10 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class GeneratePostAndAssetsEntities1772248184580 implements MigrationInterface {
-    name = 'GeneratePostAndAssetsEntities1772248184580'
+export class GeneratePostAndAssetsEntities1772248612984 implements MigrationInterface {
+    name = 'GeneratePostAndAssetsEntities1772248612984'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE TYPE "public"."media_variants_variant_enum" AS ENUM('ORIGINAL', 'MEDIUM', 'THUMBNAIL')`);
         await queryRunner.query(`CREATE TABLE "media_variants" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "url" character varying(511) NOT NULL, "key" character varying(511) NOT NULL, "variant" "public"."media_variants_variant_enum" NOT NULL, "width" integer NOT NULL, "height" integer NOT NULL, "size" bigint NOT NULL, "mimeType" character varying(255) NOT NULL, "assetId" uuid, CONSTRAINT "PK_3c1e58945b13642f502cc720a34" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "assets" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "filename" character varying(255) NOT NULL, "position" smallint NOT NULL DEFAULT '0', "postId" uuid, CONSTRAINT "PK_da96729a8b113377cfb6a62439c" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "idx_uq_asset_post_position" ON "assets" ("postId", "position") `);
@@ -19,6 +20,7 @@ export class GeneratePostAndAssetsEntities1772248184580 implements MigrationInte
         await queryRunner.query(`DROP INDEX "public"."idx_uq_asset_post_position"`);
         await queryRunner.query(`DROP TABLE "assets"`);
         await queryRunner.query(`DROP TABLE "media_variants"`);
+        await queryRunner.query(`DROP TYPE "public"."media_variants_variant_enum"`);
     }
 
 }
