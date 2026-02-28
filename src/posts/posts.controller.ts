@@ -8,7 +8,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { UploadPostDto } from './dto/upload-post.dto';
 import { ValidateMediaUpload } from './decorators/validate-media-upload.decorator';
 import { PostErrorDefinitions } from './error-definitions';
@@ -23,6 +23,7 @@ export class PostsController {
   @Post()
   @Auth(RolesEnum.USER)
   @ValidateMediaUpload()
+  @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   create(
     @UploadedFiles(new SecureImagesValidationPipe())
