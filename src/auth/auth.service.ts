@@ -13,7 +13,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthJwtPayload } from './interfaces/jwt-payload.interface';
 import { LoginUserDto } from './dto/login-user.dto';
-import { AuthErrorCodes } from './error-codes';
+import { AuthErrorDefinitions } from './error-codes';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +26,8 @@ export class AuthService {
 
   async register(registerUserDto: RegisterUserDto) {
     const email = registerUserDto.email.trim();
+    await this.verifyNotRegistered(email);
+
     const name = registerUserDto.name.trim();
 
     try {
@@ -43,6 +45,14 @@ export class AuthService {
       throw new InternalServerErrorException();
     }
   }
+
+  async verifyNotRegistered(email: string) {
+    const existingUser = await this.usersService.findOneBy({ email });
+    if (existingUser) {
+      throw AuthErrorDefinitions.EMAIL_ALREADY_REGISTERED.build(400);
+    }
+  }
+
   async login(loginUserDto: LoginUserDto) {
     const email = loginUserDto.email.trim();
     const password = loginUserDto.password;
@@ -50,11 +60,11 @@ export class AuthService {
     const user = await this.usersService.findOneBy({ email });
 
     if (!user) {
-      throw AuthErrorCodes.INVALID_CREDENTIALS.build(400);
+      throw AuthErrorDefinitions.INVALID_CREDENTIALS.build(400);
     }
 
     if (!bcrypt.compareSync(password, user.password)) {
-      throw AuthErrorCodes.INVALID_CREDENTIALS.build(400);
+      throw AuthErrorDefinitions.INVALID_CREDENTIALS.build(400);
     }
 
     const payload: AuthJwtPayload = {
@@ -68,7 +78,7 @@ export class AuthService {
 
   private handleDbError(error: any) {
     if (error?.detail?.includes('already exists')) {
-      throw AuthErrorCodes.EMAIL_ALREADY_REGISTERED.build(400);
+      throw AuthErrorDefinitions.EMAIL_ALREADY_REGISTERED.build(400);
     }
   }
 }
