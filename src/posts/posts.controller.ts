@@ -13,12 +13,15 @@ import { UploadPostDto } from './dto/upload-post.dto';
 import { ValidateMediaUpload } from './decorators/validate-media-upload.decorator';
 import { PostErrorDefinitions } from './error-definitions';
 import { SecureImagesValidationPipe } from './pipes/secure-images-validation.pipe';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { RolesEnum } from 'src/auth/enums/roles.enum';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
+  @Auth(RolesEnum.USER)
   @ValidateMediaUpload()
   @ApiConsumes('multipart/form-data')
   create(
