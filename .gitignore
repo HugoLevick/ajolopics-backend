@@ -1,4 +1,8 @@
 .env
+
+# uploads
+uploads/*
+
 # compiled output
 /dist
 /node_modules

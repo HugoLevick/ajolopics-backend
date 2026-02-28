@@ -1,9 +1,13 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PostsModule } from './posts/posts.module';
 import typeorm from './config/typeorm';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { AssetsModule } from './assets/assets.module';
 
 @Module({
   imports: [
@@ -18,8 +22,24 @@ import typeorm from './config/typeorm';
       useFactory: async (configService: ConfigService) =>
         configService.getOrThrow('typeorm'),
     }),
+    // Serve static files from the 'uploads' directory
+    ServeStaticModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => [
+        {
+          rootPath: join(
+            __dirname,
+            '..',
+            configService.getOrThrow('UPLOAD_DIR'),
+          ),
+          serveRoot: '/uploads',
+        },
+      ],
+    }),
     AuthModule,
     UsersModule,
+    PostsModule,
+    AssetsModule,
   ],
   controllers: [],
   providers: [],

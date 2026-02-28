@@ -1,6 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import {
   BadRequestException,
+  HttpStatus,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -12,6 +13,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthJwtPayload } from './interfaces/jwt-payload.interface';
 import { LoginUserDto } from './dto/login-user.dto';
+import { AuthErrorCodes } from './error-codes';
 
 @Injectable()
 export class AuthService {
@@ -48,11 +50,11 @@ export class AuthService {
     const user = await this.usersService.findOneBy({ email });
 
     if (!user) {
-      throw new BadRequestException('Invalid credentials');
+      throw AuthErrorCodes.INVALID_CREDENTIALS.build(400);
     }
 
     if (!bcrypt.compareSync(password, user.password)) {
-      throw new BadRequestException('Invalid credentials');
+      throw AuthErrorCodes.INVALID_CREDENTIALS.build(400);
     }
 
     const payload: AuthJwtPayload = {
@@ -66,7 +68,7 @@ export class AuthService {
 
   private handleDbError(error: any) {
     if (error?.detail?.includes('already exists')) {
-      throw new BadRequestException('Email already registered');
+      throw AuthErrorCodes.EMAIL_ALREADY_REGISTERED.build(400);
     }
   }
 }
