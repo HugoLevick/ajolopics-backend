@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
+  IsNumber,
   IsOptional,
   IsString,
   Length,
@@ -19,8 +21,8 @@ export class UploadPostDto {
   title: string;
 
   @IsString()
-  @Length(1, 5000)
   @IsOptional()
+  @Length(1, 5000)
   @ApiProperty({
     required: false,
     description: 'Optional description for the post',
@@ -36,5 +38,28 @@ export class UploadPostDto {
       format: 'binary',
     },
   })
-  media: Array<Express.Multer.File>; // appended by controller, not sent by client in the request body
+  media: Array<Express.Multer.File>; // appended by controller, not processed by Nest in the request body
+
+  @IsOptional()
+  // needed only for multipart/form-data
+  @Transform(({ value }) => {
+    // Case 1: "1,2,3"
+    if (typeof value === 'string') {
+      return value.split(',').map((v) => Number(v));
+    }
+
+    // Case 2: ["1","2"]
+    if (Array.isArray(value)) {
+      return value.map((v) => Number(v));
+    }
+    return value;
+  })
+  @IsNumber(undefined, { each: true })
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'number',
+    },
+  })
+  tags?: number[];
 }

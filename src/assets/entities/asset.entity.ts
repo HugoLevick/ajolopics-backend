@@ -1,4 +1,5 @@
-import { Post } from 'src/posts/entities/post.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { UserPost } from 'src/posts/entities/post.entity';
 import {
   Column,
   Entity,
@@ -13,19 +14,24 @@ import { MediaVariant } from './media-variant.entity';
 @Entity('assets')
 @Index('idx_uq_asset_post_position', ['post', 'position'], { unique: true })
 export class Asset {
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Post, (post) => post.assets)
+  @ApiProperty({ type: () => UserPost })
+  @ManyToOne(() => UserPost, (post) => post.assets)
   @JoinColumn({ foreignKeyConstraintName: 'FK_asset_post' })
-  post: Post;
+  post: UserPost;
 
+  @ApiProperty()
   @Column('varchar', { length: 255 })
   filename: string;
 
+  @ApiProperty()
   @Column('smallint', { default: 0 })
   position: number; // for ordering images
 
+  @ApiProperty({ type: () => [MediaVariant] })
   @OneToMany(() => MediaVariant, (variant) => variant.asset, {
     cascade: ['insert'],
   })

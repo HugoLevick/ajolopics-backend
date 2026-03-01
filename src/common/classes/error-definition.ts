@@ -24,7 +24,7 @@ export class ErrorDefinition {
     );
   }
 
-  format(...values: string[]) {
+  format(...values: any[]): ErrorDefinition {
     let index = 0;
 
     const formattedDescription = this.description.replace(/\{\}/g, () => {
