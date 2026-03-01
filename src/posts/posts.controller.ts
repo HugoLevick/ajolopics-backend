@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpStatus,
   Post,
   UploadedFiles,
@@ -18,10 +19,17 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { UserPost } from './entities/post.entity';
+import { FeedQueryDto } from './dto/feed-query/feed-query.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
+
+  @Post('feed')
+  @HttpCode(HttpStatus.OK)
+  getFeed(@Body() queryDto: FeedQueryDto) {
+    return this.postsService.getFeed(queryDto);
+  }
 
   @Post()
   @Auth()

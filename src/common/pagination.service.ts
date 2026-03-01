@@ -44,9 +44,6 @@ export class PaginationService {
     queryBuilder.andWhere(`(${searchConditions})`, {
       search: `%${searchTerm}%`,
     });
-    console.log(`(${searchConditions})`, {
-      search: `%${searchTerm}%`,
-    });
   }
 
   private applyPagination<T extends ObjectLiteral>(

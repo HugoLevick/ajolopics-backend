@@ -17,13 +17,6 @@ export enum OrderDirection {
 }
 
 export class BaseQueryOrderDto {
-  @ApiPropertyOptional({
-    type: String,
-    example: 'DESC',
-    enum: OrderDirection,
-    default: OrderDirection.DESC,
-    description: 'Order direction of the column',
-  })
   @IsOptional()
   @IsEnum(OrderDirection)
   direction: OrderDirection = OrderDirection.DESC;
@@ -61,7 +54,7 @@ export class BasePaginatedQueryDto<T = any> {
 
   @ApiPropertyOptional({
     type: String,
-    example: 'Condo #2',
+    example: 'Search term',
     minimum: 1,
     maximum: 1000,
     description: 'Search that will be applied to searchable columns',
@@ -71,12 +64,9 @@ export class BasePaginatedQueryDto<T = any> {
   @Length(1, 1000)
   search?: string;
 
-  @ApiPropertyOptional({
-    type: BaseQueryOrderDto,
-    description: 'Order results options',
-  })
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => BaseQueryOrderDto)
+  // No order used for base class
+  // @IsOptional()
+  // @ValidateNested()
+  // @Type(() => BaseQueryOrderDto)
   order: BaseQueryOrderDto = new BaseQueryOrderDto();
 }
