@@ -9,7 +9,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiResponse } from '@nestjs/swagger';
 import { UploadPostDto } from './dto/upload-post.dto';
 import { ValidateMediaUpload } from './decorators/validate-media-upload.decorator';
 import { PostErrorDefinitions } from './error-definitions';
@@ -17,6 +17,7 @@ import { SecureImagesValidationPipe } from './pipes/secure-images-validation.pip
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
+import { UserPost } from './entities/post.entity';
 
 @Controller('posts')
 export class PostsController {
@@ -27,6 +28,11 @@ export class PostsController {
   @ValidateMediaUpload()
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
+  @ApiResponse({
+    status: 201,
+    description: 'The post has been successfully created.',
+    type: UserPost,
+  })
   create(
     @UploadedFiles(new SecureImagesValidationPipe())
     media: Array<Express.Multer.File>,

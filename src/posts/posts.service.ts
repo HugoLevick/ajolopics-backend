@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { UploadPostDto } from './dto/upload-post.dto';
 import { AssetsService } from 'src/assets/assets.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Post } from './entities/post.entity';
+import { UserPost } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { TagsService } from 'src/tags/tags.service';
@@ -11,8 +11,8 @@ import { TagsService } from 'src/tags/tags.service';
 export class PostsService {
   private readonly logger = new Logger('PostsService');
   constructor(
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
+    @InjectRepository(UserPost)
+    private readonly postRepository: Repository<UserPost>,
     private readonly assetsService: AssetsService,
     private readonly tagsService: TagsService,
   ) {}
@@ -39,7 +39,7 @@ export class PostsService {
       await queryRunner.startTransaction();
 
       // Create the Post entity
-      const post = queryRunner.manager.create(Post, {
+      const post = queryRunner.manager.create(UserPost, {
         ...postData,
         author: user,
       });
