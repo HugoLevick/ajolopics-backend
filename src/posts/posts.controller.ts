@@ -32,7 +32,8 @@ export class PostsController {
     media: Array<Express.Multer.File>,
     @Body()
     dto: UploadPostDto,
-    @GetUser() user: User,
+    @GetUser()
+    user: User,
   ) {
     if (media.length === 0) {
       throw PostErrorDefinitions.NOT_ENOUGH_MEDIA.build(400);

@@ -6,4 +6,9 @@ export const TagErrorDefinitions = {
     'Tag name is already in use',
     409,
   ),
+  TAG_NOT_FOUND: new ErrorDefinition(
+    'TAG_NOT_FOUND',
+    'Tag with the ID "{}" does not exist',
+    404,
+  ),
 };

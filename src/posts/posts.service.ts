@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { TagsService } from 'src/tags/tags.service';
 
 @Injectable()
 export class PostsService {
@@ -13,6 +14,7 @@ export class PostsService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     private readonly assetsService: AssetsService,
+    private readonly tagsService: TagsService,
   ) {}
 
   async findOne(id: string) {
@@ -28,7 +30,7 @@ export class PostsService {
   }
 
   async create(uploadPostDto: UploadPostDto, user: User) {
-    const { media, ...postData } = uploadPostDto;
+    const { media, tags, ...postData } = uploadPostDto;
 
     const queryRunner =
       this.postRepository.manager.connection.createQueryRunner();
@@ -41,6 +43,11 @@ export class PostsService {
         ...postData,
         author: user,
       });
+
+      if (tags && tags.length > 0) {
+        post.tags = await this.tagsService.validateTagIdsExist(tags);
+      }
+
       const savedPost = await queryRunner.manager.save(post);
 
       // Create assets for the post
