@@ -1,10 +1,4 @@
-import {
-  applyDecorators,
-  BadRequestException,
-  HttpStatus,
-  Post,
-  UseInterceptors,
-} from '@nestjs/common';
+import { applyDecorators, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { PostErrorDefinitions } from '../error-definitions';
 

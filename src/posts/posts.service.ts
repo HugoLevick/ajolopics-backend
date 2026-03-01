@@ -4,6 +4,7 @@ import { AssetsService } from 'src/assets/assets.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class PostsService {
@@ -17,7 +18,7 @@ export class PostsService {
   async findOne(id: string) {
     return this.postRepository.findOne({
       where: { id },
-      relations: ['assets', 'assets.variants'],
+      relations: ['assets', 'assets.variants', 'tags', 'author'],
       order: {
         assets: {
           position: 'ASC',
@@ -26,7 +27,7 @@ export class PostsService {
     });
   }
 
-  async create(uploadPostDto: UploadPostDto) {
+  async create(uploadPostDto: UploadPostDto, user: User) {
     const { media, ...postData } = uploadPostDto;
 
     const queryRunner =
@@ -36,7 +37,10 @@ export class PostsService {
       await queryRunner.startTransaction();
 
       // Create the Post entity
-      const post = queryRunner.manager.create(Post, postData);
+      const post = queryRunner.manager.create(Post, {
+        ...postData,
+        author: user,
+      });
       const savedPost = await queryRunner.manager.save(post);
 
       // Create assets for the post

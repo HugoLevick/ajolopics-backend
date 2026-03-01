@@ -1,11 +1,14 @@
 import { Asset } from 'src/assets/entities/asset.entity';
 import { Tag } from 'src/tags/entities/tag.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -14,6 +17,10 @@ import {
 export class Post {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @ManyToOne(() => User, (user) => user.posts, { nullable: false })
+  @JoinColumn({ foreignKeyConstraintName: 'FK_posts_author_id' })
+  author: User;
 
   @OneToMany(() => Asset, (asset) => asset.post, { nullable: false })
   assets: Asset[];

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
   UploadedFiles,
@@ -14,14 +15,15 @@ import { ValidateMediaUpload } from './decorators/validate-media-upload.decorato
 import { PostErrorDefinitions } from './error-definitions';
 import { SecureImagesValidationPipe } from './pipes/secure-images-validation.pipe';
 import { Auth } from 'src/auth/decorators/auth.decorator';
-import { RolesEnum } from 'src/auth/enums/roles.enum';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  @Auth(RolesEnum.USER)
+  @Auth()
   @ValidateMediaUpload()
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
@@ -30,12 +32,13 @@ export class PostsController {
     media: Array<Express.Multer.File>,
     @Body()
     dto: UploadPostDto,
+    @GetUser() user: User,
   ) {
     if (media.length === 0) {
       throw PostErrorDefinitions.NOT_ENOUGH_MEDIA.build(400);
     }
 
     dto.media = media;
-    return this.postsService.create(dto);
+    return this.postsService.create(dto, user);
   }
 }
