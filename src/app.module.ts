@@ -8,6 +8,7 @@ import { PostsModule } from './posts/posts.module';
 import typeorm from './config/typeorm';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AssetsModule } from './assets/assets.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AssetsModule } from './assets/assets.module';
     UsersModule,
     PostsModule,
     AssetsModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
