@@ -55,6 +55,8 @@ export class UploadPostDto {
     return value;
   })
   @IsNumber(undefined, { each: true })
+  @ArrayMinSize(1)
+  @ArrayMaxSize(5)
   @ApiProperty({
     type: 'array',
     items: {
