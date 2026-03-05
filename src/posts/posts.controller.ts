@@ -12,7 +12,7 @@ import {
 import { PostsService } from './posts.service';
 import { ApiBearerAuth, ApiConsumes, ApiResponse } from '@nestjs/swagger';
 import { UploadPostDto } from './dto/upload-post.dto';
-import { ValidateMediaUpload } from './decorators/validate-media-upload.decorator';
+import { ValidateMediaUpload } from '../common/decorators/validate-media-upload.decorator';
 import { PostErrorDefinitions } from './error-definitions';
 import { SecureImagesValidationPipe } from './pipes/secure-images-validation.pipe';
 import { Auth } from 'src/auth/decorators/auth.decorator';

@@ -1,15 +1,15 @@
 import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PostsModule } from './posts/posts.module';
-import typeorm from './config/typeorm';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { AssetsModule } from './assets/assets.module';
 import { TagsModule } from './tags/tags.module';
 import { CommonModule } from './common/common.module';
+import typeorm from './config/typeorm';
 
 @Module({
   imports: [
