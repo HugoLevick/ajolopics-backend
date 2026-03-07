@@ -1,6 +1,11 @@
 import { ErrorDefinition } from 'src/common/classes/error-definition';
 
 export const PostErrorDefinitions = {
+  POST_NOT_FOUND: new ErrorDefinition(
+    'POST_NOT_FOUND',
+    'Post with id "{}" not found',
+    404,
+  ),
   INVALID_OR_CORRUPTED_MEDIA: new ErrorDefinition(
     'INVALID_OR_CORRUPTED_MEDIA',
     'The media file "{}" is invalid or corrupted',

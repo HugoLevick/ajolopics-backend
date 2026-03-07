@@ -5,6 +5,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseUUIDPipe,
   Post,
   UploadedFiles,
   UseInterceptors,
@@ -29,6 +31,12 @@ export class PostsController {
   @HttpCode(HttpStatus.OK)
   getFeed(@Body() queryDto: FeedQueryDto) {
     return this.postsService.getFeed(queryDto);
+  }
+
+  @Get('single/:id')
+  @HttpCode(HttpStatus.OK)
+  getSinglePost(@Param('id', ParseUUIDPipe) id: string) {
+    return this.postsService.findOne(id);
   }
 
   @Post()

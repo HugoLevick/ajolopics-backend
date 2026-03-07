@@ -13,6 +13,7 @@ import { AspectRatioEnum } from './dto/feed-query/feed-filters.dto';
 import { MediaVariantType } from 'src/assets/entities/media-variant.entity';
 import { PaginatedResponseDto } from 'src/common/dto/paginated-response.dto';
 import { OrderDirection } from 'src/common/dto/query/base-query-dto';
+import { PostErrorDefinitions } from './error-definitions';
 
 @Injectable()
 export class PostsService {
@@ -103,7 +104,7 @@ export class PostsService {
   }
 
   async findOne(id: string) {
-    return this.postRepository.findOne({
+    const post = await this.postRepository.findOne({
       where: { id },
       relations: ['assets', 'assets.variants', 'tags', 'author'],
       order: {
@@ -112,6 +113,12 @@ export class PostsService {
         },
       },
     });
+
+    if (!post) {
+      throw PostErrorDefinitions.POST_NOT_FOUND.format(id).build();
+    }
+
+    return post;
   }
 
   public async getFeed(
