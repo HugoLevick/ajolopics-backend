@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
@@ -34,10 +34,9 @@ export class UsersService {
       select: {
         id: true,
         name: true,
-        role: true,
       },
       where: {
-        role: RolesEnum.CREATOR,
+        role: In([RolesEnum.CREATOR, RolesEnum.ADMIN]), //TODO: show only creators with posts
       },
     });
   }
