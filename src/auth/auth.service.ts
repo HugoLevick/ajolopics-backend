@@ -11,7 +11,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthJwtPayload } from './interfaces/jwt-payload.interface';
 import { LoginUserDto } from './dto/login-user.dto';
-import { AuthErrorDefinitions } from './error-codes';
+import { AuthErrorDefinitions } from './error-definitions';
 
 @Injectable()
 export class AuthService {

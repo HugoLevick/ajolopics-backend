@@ -1,6 +1,11 @@
 import { ErrorDefinition } from 'src/common/classes/error-definition';
 
 export const AuthErrorDefinitions = {
+  INVALID_ROLE: new ErrorDefinition(
+    'INVALID_ROLE',
+    'User does not have the required role to access this resource',
+    403,
+  ),
   INVALID_CREDENTIALS: new ErrorDefinition(
     'INVALID_CREDENTIALS',
     'The provided credentials are invalid',

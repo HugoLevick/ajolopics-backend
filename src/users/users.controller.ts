@@ -12,16 +12,19 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { RolesEnum } from 'src/auth/enums/roles.enum';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { OptionalAuth } from 'src/auth/decorators/optional-auth.decorator';
+import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { User } from './entities/user.entity';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiBearerAuth()
-  @Auth(RolesEnum.ADMIN)
+  @OptionalAuth()
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@GetUser({ optional: true }) user: User | null) {
+    return this.usersService.findAll(user);
   }
 
   @ApiBearerAuth()

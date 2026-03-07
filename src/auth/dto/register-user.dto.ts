@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString, Length, Matches, MaxLength } from 'class-validator';
-import { AuthErrorDefinitions } from '../error-codes';
+import { AuthErrorDefinitions } from '../error-definitions';
 
 export class RegisterUserDto {
   @ApiProperty({
