@@ -1,5 +1,9 @@
 .env
 
+# frontend
+public/*
+!public/.gitkeep
+
 # uploads
 uploads/*
 !uploads/.gitkeep
