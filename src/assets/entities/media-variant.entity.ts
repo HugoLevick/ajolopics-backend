@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Asset } from './asset.entity';
+import { Exclude } from 'class-transformer';
 
 export enum MediaVariantType {
   ORIGINAL = 'ORIGINAL',
@@ -28,7 +29,7 @@ export class MediaVariant {
   @Column('varchar', { length: 511, nullable: false })
   url: string;
 
-  @ApiProperty()
+  @Exclude()
   @Column('varchar', { length: 511, nullable: false })
   key: string;
 

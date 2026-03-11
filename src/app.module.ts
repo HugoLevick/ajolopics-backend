@@ -32,20 +32,8 @@ import typeorm from './config/typeorm';
           rootPath: join(
             __dirname,
             '..',
-            configService.getOrThrow('UPLOAD_DIR'),
-          ),
-          serveRoot: '/uploads',
-          serveStaticOptions: {
-            redirect: false, // Disable automatic redirection to index.html'
-          },
-        },
-        {
-          rootPath: join(
-            __dirname,
-            '..',
             configService.getOrThrow('FRONTEND_DIR'),
           ),
-          serveRoot: '/',
         },
       ],
     }),

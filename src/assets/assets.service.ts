@@ -13,9 +13,10 @@ import {
 } from './entities/media-variant.entity';
 import * as sharp from 'sharp';
 import { ConfigService } from '@nestjs/config';
-import path from 'path';
+import { join } from 'path';
 import { AssetsErrorDefinitions } from './error-definitions';
 import { getHostUrl } from 'src/common/functions/get-host-url';
+import { User } from 'src/users/entities/user.entity';
 
 interface VariantRuleI {
   width?: number;
@@ -44,6 +45,20 @@ export class AssetsService {
     private readonly mediaVariantRepository: Repository<MediaVariant>,
     private readonly configService: ConfigService,
   ) {}
+
+  private buildVariantFilename(
+    assetId: string,
+    variant: MediaVariantType,
+    extension: string,
+  ) {
+    return `${assetId}-${variant}.${extension}`;
+  }
+
+  private buildAbsoluteFilePath(filename: string) {
+    const uploadDir = this.configService.getOrThrow('UPLOAD_DIR');
+    const relativePath = `${uploadDir}/${filename}`;
+    return join(__dirname, '..', '..', relativePath);
+  }
 
   public async createAssetsFromFiles(
     file: Express.Multer.File | Express.Multer.File[],
@@ -165,10 +180,12 @@ export class AssetsService {
     }
 
     const metadata = await sharp(buffer).metadata();
-    const filename = `${asset.id}-${variantType}.${extension}`;
-    const uploadDir = this.configService.getOrThrow('UPLOAD_DIR');
-    const relativePath = `${uploadDir}/${filename}`;
-    const absolutePath = relativePath;
+    const filename = this.buildVariantFilename(
+      asset.id,
+      variantType,
+      extension,
+    );
+    const absolutePath = this.buildAbsoluteFilePath(filename);
 
     // Write to disk
     await sharp(buffer).toFile(absolutePath);
@@ -179,8 +196,8 @@ export class AssetsService {
     const hostUrl = getHostUrl(this.configService);
 
     return this.mediaVariantRepository.create({
-      url: `${hostUrl}/${relativePath}`,
-      key: relativePath,
+      url: `${hostUrl}/api/assets/${asset.id}/${variantType}`,
+      key: filename,
       variant: variantType,
       width: metadata.width,
       height: metadata.height,
@@ -199,5 +216,44 @@ export class AssetsService {
         this.logger.error(`Failed to cleanup file: ${path} — ${err.message}`);
       }
     }
+  }
+
+  public async getAssetFile(
+    assetId: string,
+    variant: MediaVariantType,
+    user?: User,
+  ) {
+    if (variant === MediaVariantType.ORIGINAL && !user) {
+      throw AssetsErrorDefinitions.UNAUTHORIZED_ACCESS.build();
+    }
+
+    const mediaVariant = await this.mediaVariantRepository.findOne({
+      where: {
+        asset: { id: assetId },
+        variant,
+      },
+    });
+
+    if (!mediaVariant) {
+      throw AssetsErrorDefinitions.ASSET_NOT_FOUND.build();
+    }
+
+    // Find variant in file system
+    const filePath = this.buildAbsoluteFilePath(mediaVariant.key);
+
+    // Check if file exists
+    const file = await fs.promises
+      .readFile(filePath)
+      .catch((error) =>
+        this.logger.error(
+          `Failed to read file for asset ${assetId} variant ${variant}: ${error.message}`,
+        ),
+      );
+
+    if (!file) {
+      throw AssetsErrorDefinitions.ASSET_NOT_FOUND.build();
+    }
+
+    return { buffer: Uint8Array.from(file), mediaVariant };
   }
 }
