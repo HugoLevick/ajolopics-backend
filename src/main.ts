@@ -20,7 +20,12 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:5173'],
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://ajolopics.com',
+      'https://www.ajolopics.com',
+    ],
   });
 
   const config = new DocumentBuilder()
