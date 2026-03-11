@@ -196,7 +196,7 @@ export class AssetsService {
     const hostUrl = getHostUrl(this.configService);
 
     return this.mediaVariantRepository.create({
-      url: `${hostUrl}/api/assets/${asset.id}/${variantType}`,
+      url: `${hostUrl}/assets/${asset.id}/${variantType}`,
       key: filename,
       variant: variantType,
       width: metadata.width,
