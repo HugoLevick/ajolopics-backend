@@ -8,7 +8,7 @@ export class UpdateAssetUrlsAndKeys1773190376795 implements MigrationInterface {
     queryRunner.query(`
             UPDATE media_variants mv
             SET
-                url = CONCAT('${hostUrl}/api/assets/', a.id, '/', mv.variant),
+                url = CONCAT('${hostUrl}/assets/', a.id, '/', mv.variant),
                 key = SUBSTRING(mv.key, 9)
             FROM assets a
             WHERE mv."assetId" = a.id;
