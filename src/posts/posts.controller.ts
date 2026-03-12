@@ -41,7 +41,7 @@ export class PostsController {
 
   @Post()
   @Auth()
-  @ValidateMediaUpload()
+  @ValidateMediaUpload('media', { maxCount: 3, maxSize: 30 * 1024 * 1024 })
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
   @ApiResponse({
