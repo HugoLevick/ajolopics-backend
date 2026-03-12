@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Header,
   Param,
   ParseEnumPipe,
   ParseUUIDPipe,
@@ -19,6 +20,7 @@ export class AssetsController {
 
   @OptionalAuth()
   @Get(':assetId/:variant')
+  @Header('Cache-Control', 'public, max-age=31536000, immutable')
   @ApiBearerAuth()
   async getAssetFile(
     @Param('assetId', ParseUUIDPipe)
