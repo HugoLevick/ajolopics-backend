@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -63,5 +64,11 @@ export class PostsController {
 
     dto.media = media;
     return this.postsService.create(dto, user);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deletePost(@Param('id', ParseUUIDPipe) id: string) {
+    return this.postsService.delete(id);
   }
 }

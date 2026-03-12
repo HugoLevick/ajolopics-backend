@@ -54,7 +54,7 @@ export class AssetsService {
     return `${assetId}-${variant}.${extension}`;
   }
 
-  private buildAbsoluteFilePath(filename: string) {
+  private buildAbsoluteFilePathFromKey(filename: string) {
     const uploadDir = this.configService.getOrThrow('UPLOAD_DIR');
     const relativePath = `${uploadDir}/${filename}`;
     return join(__dirname, '..', '..', relativePath);
@@ -132,6 +132,28 @@ export class AssetsService {
     }
   }
 
+  public async deleteFilesFromAssets(assets: Asset[]) {
+    for (const asset of assets) {
+      for (const variant of asset.variants) {
+        const filePath = this.buildAbsoluteFilePathFromKey(variant.key);
+        try {
+          await fs.promises.unlink(filePath);
+          this.logger.log(`Deleted file: ${filePath}`);
+        } catch (err) {
+          this.logger.error(`Failed to delete file: ${filePath} — ${err.message}`);
+          // change name to avoid orphaned files in case of failure and to prevent conflicts with future uploads
+          const failedPath = `${filePath}.failed-delete-${Date.now()}`;
+          try {
+            await fs.promises.rename(filePath, failedPath);
+            this.logger.warn(`Renamed file after failed delete: ${filePath} to ${failedPath}`);
+          } catch (renameErr) {
+            this.logger.error(`Failed to rename file after failed delete: ${filePath} — ${renameErr.message}`);
+          }
+        }
+      }
+    }
+  }
+
   public async processAssetVariant(
     asset: Asset,
     file: Express.Multer.File,
@@ -185,7 +207,7 @@ export class AssetsService {
       variantType,
       extension,
     );
-    const absolutePath = this.buildAbsoluteFilePath(filename);
+    const absolutePath = this.buildAbsoluteFilePathFromKey(filename);
 
     // Write to disk
     await sharp(buffer).toFile(absolutePath);
@@ -239,7 +261,7 @@ export class AssetsService {
     }
 
     // Find variant in file system
-    const filePath = this.buildAbsoluteFilePath(mediaVariant.key);
+    const filePath = this.buildAbsoluteFilePathFromKey(mediaVariant.key);
 
     // Check if file exists
     const file = await fs.promises

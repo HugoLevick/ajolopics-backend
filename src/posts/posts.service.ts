@@ -1,19 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { UploadPostDto } from './dto/upload-post.dto';
 import { AssetsService } from 'src/assets/assets.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserPost } from './entities/post.entity';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { TagsService } from 'src/tags/tags.service';
 import { FeedQueryDto } from './dto/feed-query/feed-query.dto';
 import { PaginationService } from 'src/common/pagination.service';
 import { SearchableFeedFields } from './enums/searchable-feed-fields.enum';
 import { AspectRatioEnum } from './dto/feed-query/feed-filters.dto';
-import { MediaVariantType } from 'src/assets/entities/media-variant.entity';
+import {
+  MediaVariant,
+  MediaVariantType,
+} from 'src/assets/entities/media-variant.entity';
 import { PaginatedResponseDto } from 'src/common/dto/paginated-response.dto';
 import { OrderDirection } from 'src/common/dto/query/base-query-dto';
 import { PostErrorDefinitions } from './error-definitions';
+import { Asset } from 'src/assets/entities/asset.entity';
 
 @Injectable()
 export class PostsService {
@@ -173,6 +177,48 @@ export class PostsService {
       if (queryRunner.isTransactionActive) {
         await queryRunner.rollbackTransaction();
       }
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  public async delete(id: string) {
+    // Ensure the post exists before attempting deletion
+    const post = await this.findOne(id);
+
+    this.logger.log(`Attempting to delete post with id ${id}`);
+
+    const queryRunner =
+      this.postRepository.manager.connection.createQueryRunner();
+
+    try {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+      // Delete media variants
+      await queryRunner.manager.delete(MediaVariant, {
+        asset: { id: In(post.assets.map((asset) => asset.id)) },
+      });
+
+      // Delete assets
+      await queryRunner.manager.delete(Asset, {
+        post: { id: post.id },
+      });
+
+      // Delete the post itself
+      await queryRunner.manager.delete(UserPost, { id: post.id });
+
+      await queryRunner.commitTransaction();
+
+      // delete images from storage after transaction is committed to avoid orphaned files in case of transaction failure
+      await this.assetsService.deleteFilesFromAssets(post.assets);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      if (error instanceof HttpException) throw error;
+
+      this.logger.error(`Failed to delete post with id ${id}`);
+      this.logger.error(error);
       throw error;
     } finally {
       await queryRunner.release();
