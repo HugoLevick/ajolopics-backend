@@ -26,15 +26,17 @@ async function bootstrap() {
     ],
   });
 
-  const config = new DocumentBuilder()
-    .setTitle('Template API')
-    .setDescription('The Template API description')
-    .setVersion('1.0')
-    .addServer('http://localhost:3000', 'Local')
-    .addBearerAuth()
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, documentFactory);
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Ajolopics API')
+      .setDescription('The Ajolopics API description')
+      .setVersion('1.0')
+      .addServer('http://localhost:3000', 'Local')
+      .addBearerAuth()
+      .build();
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('docs', app, documentFactory);
+  }
 
   await app.listen(process.env.PORT || 3000);
 }
