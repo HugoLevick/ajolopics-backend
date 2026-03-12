@@ -18,7 +18,12 @@ export class User {
   name: string;
 
   @ApiProperty()
-  @Column('varchar', { length: 255, nullable: false, unique: true })
+  @Column('varchar', {
+    length: 255,
+    nullable: false,
+    unique: true,
+    select: false,
+  })
   email: string;
 
   @Exclude()
