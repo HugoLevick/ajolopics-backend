@@ -103,6 +103,7 @@ export class PostsService {
       .leftJoinAndSelect('post.assets', 'assets')
       .leftJoinAndSelect('assets.variants', 'variants')
       .leftJoinAndSelect('post.tags', 'tags')
+      .andWhere('assets.position = 0')
       .andWhere('variants.variant = :variant', {
         variant: MediaVariantType.THUMBNAIL,
       });
