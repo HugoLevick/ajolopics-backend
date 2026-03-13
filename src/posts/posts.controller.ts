@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,7 +9,6 @@ import {
   ParseUUIDPipe,
   Post,
   UploadedFiles,
-  UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { ApiBearerAuth, ApiConsumes, ApiResponse } from '@nestjs/swagger';
@@ -23,6 +21,10 @@ import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { UserPost } from './entities/post.entity';
 import { FeedQueryDto } from './dto/feed-query/feed-query.dto';
+import { plainToInstance } from 'class-transformer';
+import { PaginatedResponseDto } from 'src/common/dto/paginated-response.dto';
+import { PaginatedUserPostDto } from './dto/paginated-user-post.dto';
+import { UserPostDto } from './dto/user-post.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -30,14 +32,22 @@ export class PostsController {
 
   @Post('feed')
   @HttpCode(HttpStatus.OK)
-  getFeed(@Body() queryDto: FeedQueryDto) {
-    return this.postsService.getFeed(queryDto);
+  async getFeed(@Body() queryDto: FeedQueryDto) {
+    const posts = await this.postsService.getFeed(queryDto);
+
+    return plainToInstance(PaginatedUserPostDto, posts, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get('single/:id')
   @HttpCode(HttpStatus.OK)
-  getSinglePost(@Param('id', ParseUUIDPipe) id: string) {
-    return this.postsService.findOne(id);
+  async getSinglePost(@Param('id', ParseUUIDPipe) id: string) {
+    const post = await this.postsService.findOne(id);
+
+    return plainToInstance(UserPostDto, post, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Post()
@@ -48,9 +58,9 @@ export class PostsController {
   @ApiResponse({
     status: 201,
     description: 'The post has been successfully created.',
-    type: UserPost,
+    type: UserPostDto,
   })
-  create(
+  async create(
     @UploadedFiles(new SecureImagesValidationPipe())
     media: Array<Express.Multer.File>,
     @Body()
@@ -63,7 +73,11 @@ export class PostsController {
     }
 
     dto.media = media;
-    return this.postsService.create(dto, user);
+    const post = await this.postsService.create(dto, user);
+
+    return plainToInstance(UserPostDto, post, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')

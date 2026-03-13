@@ -27,14 +27,7 @@ export class UsersService {
   // Could use pagination if the number of users grows significantly, but for this demo it's not necessary
   async findAll(requestingUser?: User) {
     if (requestingUser?.role === RolesEnum.ADMIN) {
-      return this.usersRepository.find({
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-        },
-      });
+      return this.usersRepository.find();
     }
 
     return this.usersRepository.find({

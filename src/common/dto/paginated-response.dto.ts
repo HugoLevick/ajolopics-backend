@@ -1,30 +1,38 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose, Type } from 'class-transformer';
 
 export class PaginatedResponseDto<T> {
+  @Expose()
   @ApiProperty({ example: 1 })
   page: number;
 
+  @Expose()
   @ApiProperty({ example: 10 })
   size: number;
 
+  @Expose()
   @ApiProperty({ example: 100 })
   totalItems: number;
 
+  @Expose()
   @ApiProperty({
     example: 10,
     description: 'Total pages calculated from totalItems and limit',
   })
   totalPages: number;
 
+  @Expose()
   @ApiProperty({ example: true, description: 'Whether there is a next page' })
   hasNextPage: boolean;
 
+  @Expose()
   @ApiProperty({
     example: false,
     description: 'Whether there is a previous page',
   })
   hasPreviousPage: boolean;
 
+  @Expose()
   @ApiProperty({ isArray: true, type: Object })
   items: T[];
 

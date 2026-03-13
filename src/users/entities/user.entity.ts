@@ -6,31 +6,25 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class User {
-  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @OneToMany(() => UserPost, (post) => post.author)
   posts: UserPost[];
 
-  @ApiProperty()
-  @Column('varchar', { length: 255, nullable: false })
+  @Column('varchar', { length: 255 })
   name: string;
 
-  @ApiProperty()
   @Column('varchar', {
     length: 255,
     nullable: false,
     unique: true,
-    select: false,
   })
   email: string;
 
-  @Exclude()
-  @Column('varchar', { length: 255, nullable: false })
+  @Column('varchar', { length: 255 })
   password: string;
 
-  @ApiProperty({ enum: RolesEnum, enumName: 'RolesEnum' })
   @Column('enum', {
     enum: RolesEnum,
     default: RolesEnum.USER,
