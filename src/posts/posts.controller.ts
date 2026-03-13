@@ -80,9 +80,10 @@ export class PostsController {
     });
   }
 
+  @Auth()
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  deletePost(@Param('id', ParseUUIDPipe) id: string) {
-    return this.postsService.delete(id);
+  deletePost(@Param('id', ParseUUIDPipe) id: string, @GetUser() user: User) {
+    return this.postsService.delete(id, user);
   }
 }

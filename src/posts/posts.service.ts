@@ -18,6 +18,7 @@ import { PaginatedResponseDto } from 'src/common/dto/paginated-response.dto';
 import { OrderDirection } from 'src/common/dto/query/base-query-dto';
 import { PostErrorDefinitions } from './error-definitions';
 import { Asset } from 'src/assets/entities/asset.entity';
+import { RolesEnum } from 'src/auth/enums/roles.enum';
 
 @Injectable()
 export class PostsService {
@@ -183,9 +184,13 @@ export class PostsService {
     }
   }
 
-  public async delete(id: string) {
+  public async delete(id: string, user: User) {
     // Ensure the post exists before attempting deletion
     const post = await this.findOne(id);
+
+    if (post.author.id !== user.id && user.role !== RolesEnum.ADMIN) {
+      throw PostErrorDefinitions.UNAUTHORIZED_TO_DELETE_POST.build();
+    }
 
     this.logger.log(`Attempting to delete post with id ${id}`);
 

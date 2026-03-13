@@ -26,4 +26,8 @@ export const PostErrorDefinitions = {
     'TOO_MUCH_MEDIA',
     'Too many media files provided',
   ),
+  UNAUTHORIZED_TO_DELETE_POST: new ErrorDefinition(
+    'UNAUTHORIZED_TO_DELETE_POST',
+    'You are not authorized to delete this post',
+  ),
 };
