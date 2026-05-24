@@ -9,6 +9,9 @@ export class AdminUserDto {
   name: string;
 
   @Expose()
+  username: string;
+
+  @Expose()
   email: string;
 
   @Expose()

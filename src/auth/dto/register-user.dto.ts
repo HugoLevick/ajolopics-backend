@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsEmail, IsString, Length, Matches, MaxLength } from 'class-validator';
 import { AuthErrorDefinitions } from '../error-definitions';
+import {
+  normalizeUsername,
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  USERNAME_REGEX,
+} from 'src/users/username.utils';
 
 export class RegisterUserDto {
   @ApiProperty({
@@ -14,6 +21,24 @@ export class RegisterUserDto {
     message: AuthErrorDefinitions.INVALID_NAME_LENGTH.errorCode,
   })
   name: string;
+
+  @ApiProperty({
+    description: 'The unique username of the user',
+    example: 'john.doe',
+    minLength: USERNAME_MIN_LENGTH,
+    maxLength: USERNAME_MAX_LENGTH,
+  })
+  @Transform(({ value }) =>
+    typeof value === 'string' ? normalizeUsername(value) : value,
+  )
+  @IsString({ message: AuthErrorDefinitions.INVALID_USERNAME_FORMAT.errorCode })
+  @Length(USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, {
+    message: AuthErrorDefinitions.INVALID_USERNAME_LENGTH.errorCode,
+  })
+  @Matches(USERNAME_REGEX, {
+    message: AuthErrorDefinitions.INVALID_USERNAME_FORMAT.errorCode,
+  })
+  username: string;
 
   @ApiProperty({
     description: 'The email of the user',

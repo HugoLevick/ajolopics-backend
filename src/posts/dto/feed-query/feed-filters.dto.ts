@@ -1,4 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -6,8 +7,15 @@ import {
   IsEnum,
   IsInt,
   IsOptional,
-  IsUUID,
+  Length,
+  Matches,
 } from 'class-validator';
+import {
+  normalizeUsername,
+  USERNAME_MAX_LENGTH,
+  USERNAME_MIN_LENGTH,
+  USERNAME_REGEX,
+} from 'src/users/username.utils';
 
 export enum AspectRatioEnum {
   LANDSCAPE = 'LANDSCAPE',
@@ -44,20 +52,24 @@ export class FeedFiltersDto {
 
   @IsOptional()
   @IsArray()
-  @IsUUID('4', { each: true })
+  @Transform(({ value }) =>
+    Array.isArray(value)
+      ? value.map((item) =>
+          typeof item === 'string' ? normalizeUsername(item) : item,
+        )
+      : value,
+  )
+  @Length(USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, { each: true })
+  @Matches(USERNAME_REGEX, { each: true })
   @ArrayMinSize(1)
   @ArrayMaxSize(20) // Arbitrary limit to prevent abuse, can be adjusted as needed
   @ApiPropertyOptional({
     type: String,
-    format: 'uuid',
     isArray: true,
-    example: [
-      'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-      'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
-    ],
-    description: 'List of author IDs to filter by',
+    example: ['john.doe', 'jane_doe'],
+    description: 'List of usernames to filter by',
     minLength: 1,
     maxLength: 20,
   })
-  authorIds?: string[];
+  usernames?: string[];
 }

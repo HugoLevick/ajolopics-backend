@@ -9,6 +9,7 @@ import { RolesEnum } from 'src/auth/enums/roles.enum';
 interface FindOneOptions {
   email?: string;
   id?: string;
+  username?: string;
 }
 
 @Injectable()
@@ -40,6 +41,12 @@ export class UsersService {
   async findOneBy(options: FindOneOptions) {
     if (options.email) {
       return this.usersRepository.findOne({ where: { email: options.email } });
+    }
+
+    if (options.username) {
+      return this.usersRepository.findOne({
+        where: { username: options.username },
+      });
     }
 
     return this.usersRepository.findOne({ where: { id: options.id } });

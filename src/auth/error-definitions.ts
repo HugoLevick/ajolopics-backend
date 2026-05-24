@@ -30,6 +30,18 @@ export const AuthErrorDefinitions = {
     'EMAIL_ALREADY_REGISTERED',
     'The email is already registered',
   ),
+  USERNAME_ALREADY_TAKEN: new ErrorDefinition(
+    'USERNAME_ALREADY_TAKEN',
+    'The username is already taken',
+  ),
+  INVALID_USERNAME_LENGTH: new ErrorDefinition(
+    'INVALID_USERNAME_LENGTH',
+    'Username must be between 3 and 15 characters long',
+  ),
+  INVALID_USERNAME_FORMAT: new ErrorDefinition(
+    'INVALID_USERNAME_FORMAT',
+    'Username may only contain lowercase letters, numbers, underscores, and dots',
+  ),
   INVALID_PASSWORD_LENGTH: new ErrorDefinition(
     'INVALID_PASSWORD_LENGTH',
     'Password must be at least 8 characters long',

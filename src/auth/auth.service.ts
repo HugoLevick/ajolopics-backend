@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthJwtPayload } from './interfaces/jwt-payload.interface';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthErrorDefinitions } from './error-definitions';
+import { normalizeUsername } from 'src/users/username.utils';
 
 @Injectable()
 export class AuthService {
@@ -27,11 +28,14 @@ export class AuthService {
     await this.verifyNotRegistered(email);
 
     const name = registerUserDto.name.trim();
+    const username = normalizeUsername(registerUserDto.username);
+    await this.verifyUsernameAvailable(username);
 
     try {
       const user = await this.usersService.create({
         email,
         name,
+        username,
         password: bcrypt.hashSync(registerUserDto.password, 10),
       });
       delete user.password;
@@ -44,10 +48,29 @@ export class AuthService {
     }
   }
 
+  async checkUsernameAvailability(username: string) {
+    const normalizedUsername = normalizeUsername(username);
+    const existingUser = await this.usersService.findOneBy({
+      username: normalizedUsername,
+    });
+
+    return {
+      username: normalizedUsername,
+      available: !existingUser,
+    };
+  }
+
   async verifyNotRegistered(email: string) {
     const existingUser = await this.usersService.findOneBy({ email });
     if (existingUser) {
       throw AuthErrorDefinitions.EMAIL_ALREADY_REGISTERED.build(400);
+    }
+  }
+
+  async verifyUsernameAvailable(username: string) {
+    const { available } = await this.checkUsernameAvailability(username);
+    if (!available) {
+      throw AuthErrorDefinitions.USERNAME_ALREADY_TAKEN.build(400);
     }
   }
 
@@ -76,6 +99,10 @@ export class AuthService {
 
   private handleDbError(error: any) {
     if (error?.detail?.includes('already exists')) {
+      if (error?.detail?.includes('(username)=')) {
+        throw AuthErrorDefinitions.USERNAME_ALREADY_TAKEN.build(400);
+      }
+
       throw AuthErrorDefinitions.EMAIL_ALREADY_REGISTERED.build(400);
     }
   }

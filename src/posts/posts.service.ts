@@ -54,8 +54,8 @@ export class PostsService {
     if (queryDto.filters?.aspectRatio)
       this.applyAspectRatioFilter(queryBuilder, queryDto.filters?.aspectRatio);
 
-    if (queryDto.filters?.authorIds)
-      this.applyAuthorsFilter(queryBuilder, queryDto.filters?.authorIds);
+    if (queryDto.filters?.usernames)
+      this.applyUsernamesFilter(queryBuilder, queryDto.filters?.usernames);
   }
 
   private applyTagsFilter(
@@ -89,11 +89,11 @@ export class PostsService {
     }
   }
 
-  private applyAuthorsFilter(
+  private applyUsernamesFilter(
     queryBuilder: SelectQueryBuilder<UserPost>,
-    authorIds?: string[],
+    usernames?: string[],
   ) {
-    queryBuilder.andWhere('author.id IN (:...authorIds)', { authorIds });
+    queryBuilder.andWhere('author.username IN (:...usernames)', { usernames });
   }
 
   private createBaseFeedQueryBuilder(): SelectQueryBuilder<UserPost> {

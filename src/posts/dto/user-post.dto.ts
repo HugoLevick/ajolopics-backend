@@ -9,6 +9,9 @@ export class PostAuthorDto {
 
   @Expose()
   name: string;
+
+  @Expose()
+  username: string;
 }
 
 export class UserPostDto {
