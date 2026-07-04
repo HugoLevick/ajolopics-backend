@@ -50,9 +50,8 @@ export class AuthService {
 
   async checkUsernameAvailability(username: string) {
     const normalizedUsername = normalizeUsername(username);
-    const existingUser = await this.usersService.findOneBy({
-      username: normalizedUsername,
-    });
+    const existingUser =
+      await this.usersService.findOneByUsername(normalizedUsername);
 
     return {
       username: normalizedUsername,
@@ -61,7 +60,7 @@ export class AuthService {
   }
 
   async verifyNotRegistered(email: string) {
-    const existingUser = await this.usersService.findOneBy({ email });
+    const existingUser = await this.usersService.findOneByEmail(email);
     if (existingUser) {
       throw AuthErrorDefinitions.EMAIL_ALREADY_REGISTERED.build(400);
     }
@@ -78,7 +77,7 @@ export class AuthService {
     const email = loginUserDto.email.trim();
     const password = loginUserDto.password;
 
-    const user = await this.usersService.findOneBy({ email });
+    const user = await this.usersService.findOneByEmail(email);
 
     if (!user) {
       throw AuthErrorDefinitions.INVALID_CREDENTIALS.build(400);
