@@ -1,4 +1,3 @@
-import * as bcrypt from 'bcrypt';
 import {
   Inject,
   Injectable,
@@ -6,13 +5,14 @@ import {
   Logger,
   forwardRef,
 } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
-import { RegisterUserDto } from './dto/register-user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { AuthJwtPayload } from './interfaces/jwt-payload.interface';
-import { LoginUserDto } from './dto/login-user.dto';
-import { AuthErrorDefinitions } from './error-definitions';
+import * as bcrypt from 'bcrypt';
 import { normalizeUsername } from 'src/users/username.utils';
+import { UsersService } from 'src/users/users.service';
+import { LoginUserDto } from './dto/login-user.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { AuthErrorDefinitions } from './error-definitions';
+import { AuthJwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -92,8 +92,17 @@ export class AuthService {
       userId: user.id,
     };
 
+    const token = this.jwtService.sign(payload);
+    const decoded = this.jwtService.decode(token) as { exp?: number };
+
     return {
-      token: this.jwtService.sign(payload),
+      token,
+      expiresAt: decoded.exp
+        ? new Date(decoded.exp * 1000).toISOString()
+        : null,
+      expiresIn: decoded.exp
+        ? decoded.exp - Math.floor(Date.now() / 1000)
+        : null,
     };
   }
 
